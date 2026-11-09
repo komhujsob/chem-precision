@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Интерактивный практикум по физической химии: степени десяти, значащие цифры и округление результатов.">
+<meta name="theme-color" content="#f8f7f3">
+<title>Химпрактикум — Точность в химии</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f8f7f3;
+  --surface: #fffefa;
+  --ink: #221d32;
+  --muted: #625c70;
+  --purple: #5936b5;
+  --purple-dark: #432591;
+  --lavender: #eae3fa;
+  --line: #ded8e7;
+  --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+a { color: var(--purple); }
+:focus-visible { outline: 3px solid #7857d5; outline-offset: 4px; }
+[hidden] { display: none !important; }
+.skip { position: absolute; left: 1rem; top: -5rem; z-index: 5; background: white; padding: .8rem; }
+.skip:focus { top: .5rem; }
+.wrap { width: min(1180px, calc(100% - 72px)); margin-inline: auto; }
+.masthead { border-bottom: 1px solid var(--line); }
+.topbar { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: flex; gap: 11px; align-items: center; font-weight: 760; color: var(--ink); text-decoration: none; letter-spacing: -.025em; }
+.mark { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 10px; color: white; background: var(--purple); }
+.mark svg { width: 21px; }
+.topnav { display: flex; gap: clamp(18px, 3vw, 38px); align-items: center; }
+.topnav a { text-decoration: none; color: var(--muted); font-size: .9rem; font-weight: 620; }
+.topnav a:hover { color: var(--purple); }
+.progress-chip { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 99px; padding: 8px 12px; font: 12px var(--mono); white-space: nowrap; }
+.progress-chip span:first-child { width: 7px; height: 7px; border-radius: 50%; background: #8260dd; }
+.hero { display: grid; grid-template-columns: 1fr .95fr; align-items: center; gap: clamp(28px, 5vw, 74px); padding-block: 56px 58px; }
+.eyebrow, .kicker { font: 650 11px/1.5 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--purple); }
+.eyebrow { display: flex; align-items: center; gap: 11px; }
+.eyebrow::before { content: ""; width: 24px; height: 1px; background: currentColor; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(3.5rem, 6.5vw, 6.5rem); line-height: .98; letter-spacing: -.073em; margin: 22px 0; font-weight: 780; }
+h1 span { display: block; color: var(--purple); }
+.hero p { color: var(--muted); max-width: 34rem; line-height: 1.65; font-size: clamp(1rem, 1.4vw, 1.16rem); }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: .8rem; min-height: 46px; padding: 10px 17px; border: 1px solid transparent; border-radius: 8px; font-weight: 690; font-size: .92rem; text-decoration: none; line-height: 1.3; }
+.primary { background: var(--purple); color: white; }
+.primary:hover { background: var(--purple-dark); }
+.secondary { background: transparent; color: var(--ink); border-color: var(--line); }
+.secondary:hover { background: var(--lavender); }
+.plate { margin: 0; border-radius: 18px; overflow: hidden; border: 1px solid #dcd0f5; background: #eee7fb; }
+.plate svg { width: 100%; height: auto; display: block; }
+.plate figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding: 13px 17px; border-top: 1px solid #dcd0f5; color: #554575; font: 11px/1.5 var(--mono); }
+.meta { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 21px; color: var(--muted); font: 12px var(--mono); }
+.meta span + span::before { content: "·"; margin-right: 16px; color: var(--purple); }
+.lesson-section { border-top: 1px solid var(--line); padding-block: 39px 55px; }
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 19px; }
+.section-head h2 { font-size: clamp(1.8rem, 3.5vw, 2.75rem); letter-spacing: -.065em; line-height: 1.12; margin-top: 5px; }
+.section-note { color: var(--muted); font: 11px/1.5 var(--mono); text-transform: uppercase; }
+.lesson-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.lesson-tab { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; text-align: left; background: var(--surface); border: 1px solid var(--line); padding: 15px; border-radius: 10px; color: var(--ink); font-weight: 680; }
+.lesson-tab:hover, .lesson-tab[aria-selected="true"] { background: var(--lavender); border-color: #c4b2ed; }
+.lesson-tab small { color: var(--purple); font: 12px var(--mono); }
+.lesson-panel { margin-top: 12px; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: clamp(19px, 4.2vw, 50px); }
+.lesson-panel h3, .quiz-card h3 { margin: 8px 0 13px; font-size: clamp(1.35rem, 3vw, 2rem); letter-spacing: -.044em; line-height: 1.19; }
+.lesson-panel p, .quiz-card p, .quiz-intro { line-height: 1.65; color: var(--muted); }
+.lesson-panel > p { max-width: 75ch; }
+.formula { background: #f2edf9; border-left: 3px solid #9876e4; border-radius: 0 7px 7px 0; padding: 13px 16px; font: 650 clamp(.9rem, 2.5vw, 1.15rem)/1.55 var(--mono); margin: 19px 0; overflow-wrap: anywhere; }
+.worked { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-block: 20px; }
+.worked > div { border: 1px solid var(--line); padding: 16px; border-radius: 9px; }
+.worked p { margin-top: 7px; }
+.tool { padding: 20px; border-radius: 10px; margin-top: 23px; background: #f2edf9; }
+.tool label { font-weight: 700; }
+.scale { width: 100%; accent-color: var(--purple); margin: 13px 0 6px; }
+.scale-labels { display: flex; justify-content: space-between; gap: 5px; font: 12px var(--mono); color: var(--muted); }
+.scale-value { display: block; margin-top: 12px; font: 700 clamp(.95rem, 3vw, 1.22rem) var(--mono); color: var(--purple-dark); }
+.quiz-section { padding-block: 42px 60px; border-top: 1px solid var(--line); }
+.quiz-intro { margin-bottom: 17px; }
+.quiz-card { border: 1px solid var(--line); border-radius: 14px; padding: clamp(19px, 4.2vw, 46px); background: var(--surface); max-width: 800px; }
+.quiz-card progress { width: 100%; height: 8px; margin: 0 0 14px; accent-color: var(--purple); }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+legend { padding: 0; margin: 8px 0 14px; font-size: clamp(1.15rem, 2.5vw, 1.4rem); font-weight: 710; }
+.options { display: grid; gap: 8px; }
+.option { display: flex; gap: 10px; align-items: center; border: 1px solid var(--line); padding: 11px 14px; border-radius: 8px; }
+.option:has(:checked) { border-color: #aa94db; background: #f1ebfb; }
+.option input { accent-color: var(--purple); width: 17px; height: 17px; margin: 0; flex: none; }
+.feedback { display: block; margin-top: 16px; padding: 13px 15px; border-radius: 8px; background: #f2edf9; line-height: 1.5; }
+.feedback:empty { display: none; }
+.feedback[data-state="correct"] { background: #e3f3e7; color: #225734; }
+.feedback[data-state="incorrect"] { background: #fff0df; color: #76451b; }
+.footer { border-top: 1px solid var(--line); padding-block: 22px; color: var(--muted); font-size: .85rem; }
+.footer .wrap { display: flex; justify-content: space-between; gap: 10px 24px; flex-wrap: wrap; }
+@media (max-width: 770px) {
+  .wrap { width: min(100% - 36px, 620px); }
+  .hero { grid-template-columns: 1fr; gap: 25px; padding-block: 36px; }
+  .plate { max-width: 560px; }
+  .lesson-tab { padding: 11px; gap: 5px; grid-template-columns: 1fr; font-size: .84rem; }
+}
+@media (max-width: 460px) {
+  .topbar { min-height: 63px; }
+  .topnav { display: none; }
+  h1 { font-size: clamp(2.7rem, 12vw, 3.6rem); }
+  .worked { grid-template-columns: 1fr; }
+  .section-note { display: none; }
+  .meta { gap: 7px 9px; }
+  .meta span + span::before { margin-right: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<header class="masthead" id="top">
+  <div class="wrap topbar">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6m-5 0v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M8 15h8"/><path d="M12 17h.01m2 2h.01"/></svg></span>
+      Химпрактикум
+    </a>
+    <nav class="topnav" aria-label="Разделы"><a href="#start">Теория</a><a href="#practice">Тренажёр</a></nav>
+    <div class="progress-chip"><span aria-hidden="true"></span><span id="progress-text">Решено 0 / 6</span></div>
+  </div>
+</header>
+<main id="main">
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow">Физическая химия / урок 01</div>
+      <h1>Точность <span>в химии.</span></h1>
+      <p>Как записывать очень малые концентрации, считать значащие цифры и округлять результаты измерений.</p>
+      <div class="actions">
+        <a class="button primary" href="#start">Начать урок <span aria-hidden="true">↓</span></a>
+        <a class="button secondary" href="#practice">Решать задачи</a>
+      </div>
+      <div class="meta"><span>3 главы</span><span>6 задач</span><span>~ 12 минут</span></div>
+    </div>
+    <figure class="plate">
+      <svg viewBox="0 0 520 350" role="img" aria-labelledby="plate-title">
+        <title id="plate-title">Схема мерной колбы с раствором концентрации 2,50 умножить на 10 в степени минус три моль на литр</title>
+        <defs>
+          <pattern id="grid" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0v22" fill="none" stroke="#dbcef4" stroke-width="1"/></pattern>
+          <linearGradient id="liquid" x2="0" y2="1"><stop stop-color="#cdb8fa"/><stop offset="1" stop-color="#a989ef"/></linearGradient>
+          <clipPath id="flask"><path d="M238 69h44v82c0 19 13 32 31 46 25 20 39 46 39 69 0 28-17 41-40 41H208c-23 0-40-13-40-41 0-23 14-49 39-69 18-14 31-27 31-46z"/></clipPath>
+        </defs>
+        <rect width="520" height="350" fill="#eee7fb"/>
+        <rect x="21" y="21" width="478" height="308" fill="url(#grid)" stroke="#d9cbf2"/>
+        <g fill="#655383" font-family="monospace" font-size="11" letter-spacing="1">
+          <text x="38" y="45">СХЕМА 01 / РАСТВОР</text>
+          <text x="408" y="45">V = 1,00 л</text>
+          <text x="374" y="126">МЕТКА</text>
+          <text x="374" y="247">КОНЦЕНТРАЦИЯ</text>
+          <text x="38" y="309">n / V</text>
+        </g>
+        <path d="M260 47v274" stroke="#bba6e6" stroke-dasharray="4 6"/>
+        <circle cx="260" cy="222" r="100" fill="none" stroke="#d1bfee" stroke-dasharray="3 6"/>
+        <g clip-path="url(#flask)">
+          <rect x="148" y="68" width="222" height="248" fill="#fcfaff" fill-opacity=".64"/>
+          <path d="M153 119H368V311H153Z" fill="url(#liquid)"/>
+          <path d="M237 117q23 6 46 0" fill="none" stroke="#7554be" stroke-width="2"/>
+          <g fill="#ede3ff" stroke="#8867cc">
+            <circle cx="218" cy="253" r="6"/><circle cx="270" cy="224" r="5"/><circle cx="310" cy="273" r="7"/><circle cx="247" cy="282" r="4"/><circle cx="284" cy="259" r="3"/>
+          </g>
+        </g>
+        <path d="M238 69h44v82c0 19 13 32 31 46 25 20 39 46 39 69 0 28-17 41-40 41H208c-23 0-40-13-40-41 0-23 14-49 39-69 18-14 31-27 31-46z" fill="none" stroke="#6845b3" stroke-width="2.3"/>
+        <rect x="229" y="59" width="62" height="12" rx="4" fill="#f5eeff" stroke="#6845b3" stroke-width="2"/>
+        <path d="M233 121h55m2 0h76M345 242h21M242 166c-5 16-16 28-31 40-19 15-30 35-34 53" fill="none" stroke="#8469bd" stroke-width="1.2"/>
+        <circle cx="345" cy="242" r="2.5" fill="#6845b3"/>
+        <rect x="46" y="146" width="129" height="65" rx="6" fill="#fbf8ff" stroke="#d4c2f4"/>
+        <text x="59" y="168" fill="#655383" font-family="monospace" font-size="10" letter-spacing="1">МОЛЬ / Л</text>
+        <text x="59" y="193" fill="#5332a3" font-family="monospace" font-size="20" font-weight="bold">2,50·10⁻³</text>
+        <path d="M175 177h47" stroke="#8469bd" stroke-dasharray="3 4"/>
+      </svg>
+      <figcaption><span>РИС. 01 · МЕРНАЯ КОЛБА</span><span>c = n / V</span></figcaption>
+    </figure>
+  </div>
+  <section class="lesson-section" id="start" aria-labelledby="theory-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="kicker">01 / теория</div><h2 id="theory-heading">Разберём по шагам</h2></div>
+        <span class="section-note">От записи числа к расчёту</span>
+      </div>
+      <div class="lesson-nav" role="tablist" aria-label="Главы урока">
+        <button class="lesson-tab" type="button" role="tab" id="tab-1" aria-controls="lesson-1" aria-selected="true"><small>01</small> Степени десяти</button>
+        <button class="lesson-tab" type="button" role="tab" id="tab-2" aria-controls="lesson-2" aria-selected="false" tabindex="-1"><small>02</small> Значащие цифры</button>
+        <button class="lesson-tab" type="button" role="tab" id="tab-3" aria-controls="lesson-3" aria-selected="false" tabindex="-1"><small>03</small> Точность расчёта</button>
+      </div>
+      <article class="lesson-panel" id="lesson-1" role="tabpanel" aria-labelledby="tab-1" tabindex="0">
+        <div class="kicker">Глава 01</div>
+        <h3>Стандартная запись числа</h3>
+        <p>В пробе объёмом 1,00 л содержится 0,00250 моль вещества. Концентрацию удобнее записать как 2,50 × 10<sup>−3</sup> моль/л. Показатель −3 означает, что 2,50 разделили на тысячу.</p>
+        <div class="formula">x = a × 10<sup>n</sup>, &nbsp; 1 ≤ |a| &lt; 10</div>
+        <p>Для ненулевого числа <i>a</i> — мантисса, а <i>n</i> — целый показатель степени. При умножении показатели складывают, при делении вычитают. При сложении сначала приводят оба слагаемых к одной степени десяти.</p>
+        <div class="tool">
+          <label for="exponent">Шкала концентраций</label>
+          <p id="scale-help">Сдвинь ползунок на одно деление и посмотри, как меняется концентрация.</p>
+          <input class="scale" id="exponent" type="range" min="-7" max="0" step="1" value="-3" aria-describedby="scale-help">
+          <div class="scale-labels" aria-hidden="true"><span>10⁻⁷</span><span>10⁻⁶</span><span>10⁻⁵</span><span>10⁻⁴</span><span>10⁻³</span><span>10⁻²</span><span>10⁻¹</span><span>10⁰</span></div>
+          <output class="scale-value" id="scale-value" for="exponent">2,50 × 10⁻³ моль/л = 0,00250 моль/л</output>
+        </div>
+        <div class="actions"><button class="button primary" type="button" data-next-tab="1">К значащим цифрам <span aria-hidden="true">→</span></button></div>
+      </article>
+      <article class="lesson-panel" id="lesson-2" role="tabpanel" aria-labelledby="tab-2" tabindex="0" hidden>
+        <div class="kicker">Глава 02</div>
+        <h3>Какие цифры значащие?</h3>
+        <p>Начни счёт с первой ненулевой цифры. Нули между значащими цифрами учитываются. Конечные нули в десятичной дроби показывают, до какого разряда записано измерение.</p>
+        <div class="worked">
+          <div><strong>0,00407 г → 3 цифры</strong><p>Ноль между 4 и 7 учитывается. Нули перед 4 задают положение запятой.</p></div>
+          <div><strong>0,0500 л → 3 цифры</strong><p>Оба нуля после 5 значащие. Стандартная запись — 5,00 × 10<sup>−2</sup> л.</p></div>
+        </div>
+        <p>Запись 1500 г сама по себе оставляет точность конечных нулей неясной. Записи 1,5 × 10<sup>3</sup> и 1,500 × 10<sup>3</sup> явно задают две и четыре значащие цифры соответственно.</p>
+        <div class="actions"><button class="button primary" type="button" data-next-tab="2">К правилам расчёта <span aria-hidden="true">→</span></button></div>
+      </article>
+      <article class="lesson-panel" id="lesson-3" role="tabpanel" aria-labelledby="tab-3" tabindex="0" hidden>
+        <div class="kicker">Глава 03</div>
+        <h3>До какого разряда округлять?</h3>
+        <p>В учебных расчётах с измеренными величинами правило зависит от действия.</p>
+        <div class="worked">
+          <div><strong>Сложение и вычитание</strong><p>Смотри на разряд последней записанной цифры. Например, 12,4 г + 0,38 г = 12,78 г. Округляем до десятых и получаем <strong>12,8 г</strong>.</p></div>
+          <div><strong>Умножение и деление</strong><p>Смотри на наименьшее число значащих цифр. Если разделить 0,125 моль на 2,4 л, результат до двух значащих цифр составит <strong>0,052 моль/л</strong>.</p></div>
+        </div>
+        <p>В промежуточных вычислениях сохраняй запас цифр и округляй итог. Точные числа, например коэффициенты в уравнении реакции или 1000 мл в одном литре, не ограничивают число значащих цифр.</p>
+        <div class="actions"><a class="button primary" href="#practice">Перейти к задачам <span aria-hidden="true">↓</span></a></div>
+      </article>
+    </div>
+  </section>
+  <section class="quiz-section" id="practice" aria-labelledby="practice-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="kicker">02 / практика</div><h2 id="practice-heading">Проверь себя</h2></div>
+      </div>
+      <p class="quiz-intro">Выбери ответ и посмотри разбор. Ошибку можно исправить при повторном прохождении.</p>
+      <noscript><p>Включи JavaScript, чтобы пройти тренажёр.</p></noscript>
+      <div class="quiz-card" id="quiz" hidden>
+        <progress id="quiz-progress" max="6" value="0" aria-label="Проверено задач"></progress>
+        <div id="quiz-step" class="kicker"></div>
+        <form id="quiz-form">
+          <fieldset id="question-field">
+            <legend id="question" tabindex="-1"></legend>
+            <div id="options" class="options"></div>
+          </fieldset>
+          <div id="feedback" class="feedback" role="status"></div>
+          <div class="actions">
+            <button type="submit" id="check" class="button primary" disabled>Проверить</button>
+            <button type="button" id="next-question" class="button primary" hidden>Дальше →</button>
+          </div>
+        </form>
+        <div id="summary" hidden>
+          <h3 id="score" tabindex="-1"></h3>
+          <p id="score-detail"></p>
+          <div class="actions"><button class="button primary" type="button" id="restart">Пройти ещё раз</button><a class="button secondary" href="#start">Повторить теорию</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap"><span>Химпрактикум · Физическая химия</span><a href="https://openstax.org/books/chemistry-2e/pages/1-5-measurement-uncertainty-accuracy-and-precision">Дополнительное чтение · OpenStax Chemistry 2e ↗</a></div>
+</footer>
+<script>
+const tabs = [...document.querySelectorAll('[role="tab"]')];
+
+function selectLesson(index) {
+  tabs.forEach((tab, position) => {
+    const selected = index === position;
+    tab.setAttribute('aria-selected', selected);
+    tab.tabIndex = selected ? 0 : -1;
+    document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
+  });
+  tabs[index].focus();
+}
+
+tabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectLesson(index));
+  tab.addEventListener('keydown', (event) => {
+    const destination = {
+      ArrowLeft: (index + tabs.length - 1) % tabs.length,
+      ArrowRight: (index + 1) % tabs.length,
+      Home: 0,
+      End: tabs.length - 1
+    }[event.key];
+    if (destination === undefined) return;
+    event.preventDefault();
+    selectLesson(destination);
+  });
+});
+document.querySelectorAll('[data-next-tab]').forEach((button) => {
+  button.addEventListener('click', () => selectLesson(Number(button.dataset.nextTab)));
+});
+
+const exponent = document.getElementById('exponent');
+const scaleValue = document.getElementById('scale-value');
+const superscript = '⁰¹²³⁴⁵⁶⁷';
+function updateScale() {
+  const power = Number(exponent.value);
+  const shift = Math.abs(power);
+  const decimal = shift === 0 ? '2,50' : '0,' + '0'.repeat(shift - 1) + '250';
+  const notation = (power < 0 ? '⁻' : '') + superscript[shift];
+  scaleValue.value = '2,50 × 10' + notation + ' моль/л = ' + decimal + ' моль/л';
+  exponent.setAttribute('aria-valuetext', decimal + ' моль на литр');
+}
+exponent.addEventListener('input', updateScale);
+updateScale();
+
+const questions = [
+  {
+    prompt: 'Как записать 0,000360 моль/л в стандартном виде, сохранив точность записи?',
+    options: ['3,6 × 10⁻⁴ моль/л', '3,60 × 10⁻⁴ моль/л', '3,60 × 10⁻³ моль/л'],
+    correct: 1,
+    explanation: 'Переносим запятую на четыре позиции вправо и сохраняем конечный ноль в мантиссе.'
+  },
+  {
+    prompt: 'Чему равно произведение (2,0 × 10⁻³) × (3,0 × 10⁻²)?',
+    options: ['6,0 × 10⁻⁵', '6,0 × 10⁻¹', '5,0 × 10⁻⁵'],
+    correct: 0,
+    explanation: 'Умножаем мантиссы и складываем показатели: −3 + (−2) = −5. Оставляем две значащие цифры.'
+  },
+  {
+    prompt: 'Сколько значащих цифр в записи 0,02050 г?',
+    options: ['Три', 'Пять', 'Четыре'],
+    correct: 2,
+    explanation: 'Считаем от первой ненулевой цифры: 2, 0, 5, 0. Последний ноль сохраняет разряд измерения.'
+  },
+  {
+    prompt: 'Взвесили стакан массой 18,4 г и добавили 2,36 г соли. Как записать общую массу?',
+    options: ['20,76 г', '20,8 г', '21 г'],
+    correct: 1,
+    explanation: 'Сумма равна 20,76 г. Масса стакана записана до десятых, поэтому сумму округляем до десятых.'
+  },
+  {
+    prompt: 'Раствор содержит 0,246 моль вещества в 2,5 л. Как записать концентрацию?',
+    options: ['0,098 моль/л', '0,0984 моль/л', '0,1 моль/л'],
+    correct: 0,
+    explanation: '0,246 ÷ 2,5 = 0,0984. В объёме две значащие цифры, поэтому округляем до 0,098 моль/л.'
+  },
+  {
+    prompt: 'Как записать 3,50 мл в литрах, учитывая точность измерения?',
+    options: ['0,0035 л', '0,0350 л', '0,00350 л'],
+    correct: 2,
+    explanation: 'В литре ровно 1000 мл. Деление на точный коэффициент сохраняет все три значащие цифры.'
+  }
+];
+
+const quiz = document.getElementById('quiz');
+const quizForm = document.getElementById('quiz-form');
+const quizStep = document.getElementById('quiz-step');
+const questionField = document.getElementById('question-field');
+const questionLabel = document.getElementById('question');
+const optionList = document.getElementById('options');
+const feedback = document.getElementById('feedback');
+const check = document.getElementById('check');
+const next = document.getElementById('next-question');
+const summary = document.getElementById('summary');
+const score = document.getElementById('score');
+const scoreDetail = document.getElementById('score-detail');
+const progressText = document.getElementById('progress-text');
+const quizProgress = document.getElementById('quiz-progress');
+const storageKey = 'chem-precision.quiz.v1';
+let answers = [];
+
+try {
+  const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  if (Array.isArray(saved) && saved.length <= questions.length &&
+      saved.every((answer, index) => Number.isInteger(answer) && answer >= 0 && answer < questions[index].options.length)) {
+    answers = saved;
+  }
+} catch {
+  // The quiz still works if local storage is unavailable.
+}
+
+function saveAnswers() {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(answers));
+  } catch {
+    // Keep the current session usable in private or restricted browsers.
+  }
+}
+
+function renderQuestion(focus = false) {
+  const index = answers.length;
+  const correctCount = answers.filter((answer, position) => questions[position].correct === answer).length;
+  progressText.textContent = 'Решено ' + correctCount + ' / ' + questions.length;
+  quizProgress.value = index;
+  const done = index === questions.length;
+  quizForm.hidden = done;
+  summary.hidden = !done;
+  if (done) {
+    quizStep.textContent = 'Результат';
+    score.textContent = correctCount + ' из ' + questions.length + ' верно';
+    scoreDetail.textContent = correctCount === questions.length
+      ? 'Все ответы верны. Ты учёл и разряд, и значащие цифры.'
+      : 'Можно повторить правила и пройти задачи ещё раз.';
+    if (focus) score.focus();
+    return;
+  }
+
+  const question = questions[index];
+  quizStep.textContent = 'Задача ' + (index + 1) + ' / ' + questions.length;
+  questionLabel.textContent = question.prompt;
+  optionList.replaceChildren();
+  question.options.forEach((option, position) => {
+    const label = document.createElement('label');
+    label.className = 'option';
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'answer';
+    radio.value = position;
+    label.append(radio, document.createTextNode(option));
+    optionList.append(label);
+  });
+  questionField.disabled = false;
+  feedback.textContent = '';
+  delete feedback.dataset.state;
+  check.disabled = true;
+  check.hidden = false;
+  next.hidden = true;
+  if (focus) questionLabel.focus();
+}
+
+quizForm.addEventListener('change', () => { check.disabled = false; });
+quizForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const selected = optionList.querySelector(':checked');
+  if (!selected || questionField.disabled) return;
+  const question = questions[answers.length];
+  const answer = Number(selected.value);
+  const correct = question.correct === answer;
+  answers.push(answer);
+  saveAnswers();
+  const correctCount = answers.filter((value, index) => questions[index].correct === value).length;
+  progressText.textContent = 'Решено ' + correctCount + ' / ' + questions.length;
+  quizProgress.value = answers.length;
+  feedback.dataset.state = correct ? 'correct' : 'incorrect';
+  feedback.textContent = (correct ? 'Верно! ' : 'Правильный ответ — ' + question.options[question.correct] + '. ') + question.explanation;
+  questionField.disabled = true;
+  check.hidden = true;
+  next.textContent = answers.length === questions.length ? 'К результату →' : 'Дальше →';
+  next.hidden = false;
+  next.focus();
+});
+
+next.addEventListener('click', () => renderQuestion(true));
+document.getElementById('restart').addEventListener('click', () => {
+  answers = [];
+  saveAnswers();
+  renderQuestion(true);
+});
+quiz.hidden = false;
+renderQuestion();
+</script>
+</body>
+</html>
